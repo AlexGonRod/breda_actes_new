@@ -1,0 +1,4 @@
+
+reflex==0.8.13
+gspread==5.7.2
+python_dotenv==1.1.1

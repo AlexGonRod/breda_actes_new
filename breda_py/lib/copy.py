@@ -1,0 +1,16 @@
+copy: list[str] = [
+     "El concurs està obert a tothom que vulgui participar.",
+     "La inscripció serà de 10,00€ i es pagaran el mateix dia del concurs.",
+     "Cada participant podrà presentar una única paella.",
+     "S’ha de fer reserva prèvia entre el 15/10 i 29/10. On es farà constar el nom, cognoms i telèfon del participant i els plats aproximats que sortiran de la paella. (la quantia es indiferent, es premia la millor paella).",
+     "A partir de les 10.00 h s’obrirà l’espai habilitat a l’aparcament de Can Globus, per als participants.",
+     "Els criteris de valoració inclouran sabor, presentació i originalitat.",
+     "Els participants portaran tot el seu material, així com tots els productes que necessitin. S'acceptará portar el brou preparat de casa com també els ingredients del sofregit, però en aquest darrer cas, s'haura de cuinar in situ.",
+     "Els participants tindran permís de l’Ajuntament per a fer foc amb llenya o butà (elecció lliure).",
+     "Tots els participants hauran de tenir en compte reservar un plat de paella per tal que el jurat pugui fer el tast i les valoracions oportunes de cara a l’elecció de la paella guanyadora.",
+     "L'organització es reserva el dret de desqualificar qualsevol participant que no compleixi les bases establertes.",
+     "A les 13.15h totes les paelles hauran d’estar a punt per servir.",
+     "Els guanyadors seran anunciats al final del concurs i rebran premis especials.",
+     "La participació en el concurs implica l'acceptació total d'aquestes bases.",
+     "En quant al fet de fer foc, estem en un entorn urbà, però s’han de respectar les mesures de seguretat i de prevenció d’incendis. Qualsevol persona o participant que no respecti les directrius de seguretat, serà exclòs automàticament per la participació del concurs.",
+]
