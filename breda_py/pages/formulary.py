@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-GOOGLE_SPREADSHEET_ID=os.getenv("GOOGLE_SPREADSHEET_ID") or ""
+GOOGLE_SPREADSHEET_ID=os.getenv("GOOGLE_ACTES_SPREADSHEET_ID") or ""
 GOOGLE_SHEET = "Paellas 2025"
 
 
@@ -133,6 +133,4 @@ def formulari():
                 spacing="15px",
             ),
             rx.divider(),
-
-            justify="center",
     )
