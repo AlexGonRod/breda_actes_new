@@ -2,6 +2,7 @@ import reflex as rx
 from .lib import copy
 
 from .pages.formulary import formulari
+from .pages.uploader import factures
 
 
 def index() -> rx.Component:
@@ -26,3 +27,4 @@ def index() -> rx.Component:
 app = rx.App()
 app.add_page(index)
 app.add_page(formulari, route="/formulari", title="Formulari de la Breda")
+app.add_page(factures, route="/factures", title="Factures")
