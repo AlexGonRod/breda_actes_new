@@ -1,5 +1,6 @@
 import gspread
 import os
+from google.oauth2.service_account import Credentials
 from .error_handling import (WorksheetNotFound, SpreadsheetNotFound, APIError, dataAppendError, PermissionDenied)
 
 from dotenv import load_dotenv
@@ -21,6 +22,9 @@ credentials = {
     "universe_domain": os.getenv("GOOGLE_UNIVERSE_DOMAIN"),
 }
 
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+creds = Credentials.from_service_account_info(credentials, scopes=SCOPES)
+
 # Validar que todas las credenciales se cargaron
 missing = [k for k, v in credentials.items() if v is None]
 if missing:
@@ -36,7 +40,7 @@ class DATASTORE:
 class GoogleSheets:
     def __init__(self, spreadhseet_name: str, sheet_name: str):
         # authorize the clientsheet
-            self.client = gspread.service_account_from_dict(credentials)
+            self.client = gspread.Client(auth=creds)
 
             # get the instance of the Spreadsheet
             self.ws = self.client.open_by_key(spreadhseet_name)
@@ -64,7 +68,7 @@ class GoogleSheets:
         except gspread.exceptions.WorksheetNotFound:
             raise WorksheetNotFound(f"{self.ws}")
 
-        except gspread.exceptions.APIError as e:    
+        except gspread.exceptions.APIError as e:
             if e.response.status_code == 404:
                 raise SpreadsheetNotFound(f"{self.sheet}")
             if e.response.status_code == 429:
