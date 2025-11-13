@@ -1,6 +1,6 @@
 import reflex as rx
 from ..components.wrapper  import wrapper
-from ..lib.google import GoogleSheets
+from ..lib.googleSheets import GoogleSheets
 import os
 from dotenv import load_dotenv
 
@@ -20,7 +20,7 @@ class FormState(rx.State):
         yield
 
         try:
-            GoogleSheets(GOOGLE_SPREADSHEET_ID, GOOGLE_SHEET).append_row(list(form_data.values()))
+            GoogleSheets(GOOGLE_SPREADSHEET_ID, GOOGLE_SHEET).append_row(list(form_data.values()), type="formdata")
             self.loading = False
             yield rx.toast.success(f"✅ Reserva enviada correctament", duration=3000, position="top-center")
 
