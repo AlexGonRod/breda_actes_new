@@ -1,33 +1,62 @@
 import reflex as rx
 from ..lib.gemini import Gemini
+from ..lib.googleSheets import GoogleSheets
+import os
+from dotenv import load_dotenv
+from pathlib import Path
+
+load_dotenv()
+GOOGLE_FACTURES_SPREADSHEET_ID=os.getenv("GOOGLE_FACTURES_SPREADSHEET_ID") or ""
+GOOGLE_SHEET = "2-JUSTIFICACIO_RELACIO DESPESES"
+
 
 class State(rx.State):
     """The app state."""
 
-    # The images to show.
-    img: list[str] = []
-    gemini_response:dict = {}
+    data_img: list[str] = []
+    images: list[str] = []
+    gemini_response: list= []
+    loading: bool = False
+    path = rx.get_upload_dir()
+
 
     async def handle_upload(
         self, files: list[rx.UploadFile]
     ):
+
         for file in files:
             upload_data = await file.read()
-            outfile = rx.get_upload_dir() / file.name
+            outfile = self.path / file.name
 
             # Save the file.
             with outfile.open("wb") as file_object:
                 file_object.write(upload_data)
 
             # Update the img var.
-            self.img.append(file.name)
+            self.data_img.append(file.name if file.name else "")
+            self.images.append(file.name if file.name else "")
 
         try:
-            response = Gemini(self.img).get_result()
-            self.gemini_response = response[0]
-            print(self.gemini_response)
+            self.gemini_response = Gemini(self.data_img).get_result()
+
         except Exception as e:
             raise Exception(f"Error al procesar la imatge {str(e)}")
+
+        try:
+            self.loading = True
+            yield
+
+            response = GoogleSheets(GOOGLE_FACTURES_SPREADSHEET_ID, GOOGLE_SHEET).append_row(self.gemini_response)
+            if response is not None:
+                self.data_img = []
+                self.loading = False
+                yield rx.toast.success(f"✅ Dades enviades correctament", duration=3000, position="top-center")
+
+        except Exception as e:
+            self.loading = False
+            message = e.message if hasattr(e, 'message') else str(e)
+            print(f"❌ Error enviant dades: {message}")
+            yield rx.toast.error(f"❌ Error enviant dades: {message}", duration=5000, position="top-center")
 
 
 def image_uploader():
@@ -79,7 +108,7 @@ def image_uploader():
         ),
         rx.grid(
             rx.foreach(
-                State.img,
+                State.images,
                 lambda img: rx.vstack(
                     rx.image(src=rx.get_upload_url(img),
                                 border_radius="8px",
