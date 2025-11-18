@@ -1,7 +1,7 @@
 import gspread
 from google.oauth2.service_account import Credentials
 import os
-from ..error_handling import PermissionDenied, SpreadsheetNotFound
+from ...lib.error_handling import PermissionDenied, SpreadsheetNotFound
 
 from dotenv import load_dotenv
 

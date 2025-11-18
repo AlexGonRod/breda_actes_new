@@ -1,5 +1,5 @@
 import gspread
-from .error_handling import (WorksheetNotFound, SpreadsheetNotFound, APIError, dataAppendError, PermissionDenied)
+from ..lib.error_handling import (WorksheetNotFound, SpreadsheetNotFound, APIError, dataAppendError, PermissionDenied)
 from .google_clients.google_client import GoogleClient
 from typing import TypedDict
 
@@ -50,7 +50,7 @@ def get_first_empty_row(sheet, start, end, col=2):
         return start + len(values)
     return None  # bloque lleno
 
-class GoogleSheets:
+class SheetsService:
     def __init__(self, spreadsheet_name: str, sheet_name: str):
         # authorize the clientsheet
         self.client = GoogleClient(spreadsheet_name, sheet_name)
