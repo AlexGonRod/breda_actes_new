@@ -1,6 +1,6 @@
 import reflex as rx
-from ..lib.gemini import Gemini
-from ..lib.googleSheets import GoogleSheets
+from ..services.gemini_service import Gemini
+from ..services.sheets_service import GoogleSheets
 import os
 from dotenv import load_dotenv
 from pathlib import Path

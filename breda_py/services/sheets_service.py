@@ -1,6 +1,6 @@
 import gspread
 from .error_handling import (WorksheetNotFound, SpreadsheetNotFound, APIError, dataAppendError, PermissionDenied)
-from .controllers.google_client import GoogleClient
+from .google_clients.google_client import GoogleClient
 from typing import TypedDict
 
 
@@ -61,7 +61,7 @@ class GoogleSheets:
     def __mock_formdata__(self, data):
         return self.client.last_row+1,data[0], data[1], data[2]
 
-    def append_row(self, data: list[FORMDATA] | list[FACTURADATA], type: str = "") -> tuple[bool, str]: 
+    def append_row(self, data: list[FORMDATA] | list[FACTURADATA], type: str = "") -> tuple[bool, str]:
         if not data:
             raise dataAppendError("No hay datos para añadir")
 

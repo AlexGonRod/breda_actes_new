@@ -1,4 +1,4 @@
-from .controllers.gemini_client import GeminiClient
+from .google_clients.gemini_client import GeminiClient
 from typing import List
 import json
 from PIL import Image
