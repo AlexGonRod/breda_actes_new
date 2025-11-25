@@ -46,7 +46,7 @@ class State(rx.State):
             self.loading = True
             yield
 
-            response = GoogleSheets(GOOGLE_FACTURES_SPREADSHEET_ID, GOOGLE_SHEET).append_row(self.gemini_response)
+            response = SheetsService(GOOGLE_FACTURES_SPREADSHEET_ID, GOOGLE_SHEET).append_row(self.gemini_response)
             if response is not None:
                 self.data_img = []
                 self.loading = False
@@ -103,7 +103,7 @@ def image_uploader():
             },
             no_keyboard=True,
             on_drop=State.handle_upload(
-                rx.upload_files(upload_id="upload2")
+               files= rx.upload_files(upload_id="upload2")
             ),
         ),
         rx.grid(

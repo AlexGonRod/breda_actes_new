@@ -5,7 +5,7 @@ class ErrorHandlerBase(Exception):
         self.message = msg;
         super().__init__(self.message)
 
-class PermissionDenied(BaseException):
+class PermissionDenied(ErrorHandlerBase):
     def __init__(self, msg:str):
         super().__init__(f"Permiso denegado: {msg}")
 
