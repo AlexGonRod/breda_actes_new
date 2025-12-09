@@ -2,7 +2,13 @@ import gspread
 from ..lib.error_handling import (WorksheetNotFound, SpreadsheetNotFound, APIError, dataAppendError, PermissionDenied)
 from .google_clients.google_client import GoogleClient
 from typing import TypedDict
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+
+GOOGLE_FACTURES_SPREADSHEET_ID=os.getenv("GOOGLE_FACTURES_SPREADSHEET_ID") or ""
+GOOGLE_SHEET_DADES = "4-RELACIO_DESPESES_PER_UNITAT"
 
 class FORMDATA:
     nombre: str;
@@ -16,11 +22,13 @@ class FACTURADATA(TypedDict):
     NIF_CIF: str;
     tipo_material: str;
     total: str;
+    lineas: list[dict];
 
-def mockData(factures: list[FACTURADATA]) -> list:
-    mocked: list = [];
+def mockData(factures: list[FACTURADATA]) -> tuple[list, list]:
+    mockedBill: list = [];
+    mockedUnit: list = [];
     for factura in factures:
-        mocked.append([
+        mockedBill.append([
             "Factura",  # Tipus de document (puedes ajustar según el caso)
             factura.get("num_de_documento", ""),
             factura.get("fecha", ""),
@@ -30,8 +38,18 @@ def mockData(factures: list[FACTURADATA]) -> list:
             factura.get("total", ""),
             "100,00%",
         ])
-    print(f"Mocked data: {mocked}")
-    return mocked
+        for linea in factura["lineas"]:
+            mockedUnit.append([
+                factura.get("num_de_documento", ""),
+                factura.get("proveedor", ""),
+                factura.get("fecha", ""),
+                linea.get("concepto", ""),
+                linea.get("cantidad", ""),
+                linea.get("precio_unitario", ""),
+                linea.get("importe", ""),
+            ])
+    return mockedBill, mockedUnit
+
 
 BLOCKS = [
     {"start": 17, "end": 36},   # Primer bloque
@@ -50,6 +68,19 @@ def get_first_empty_row(sheet, start, end, col=2):
         return start + len(values)
     return None  # bloque lleno
 
+def append_data_row(data:list[FACTURADATA]) -> tuple[bool, str]:
+    client = GoogleClient(GOOGLE_FACTURES_SPREADSHEET_ID, GOOGLE_SHEET_DADES)
+
+    print(f"client.last_row+1: {client.last_row+1}")
+    try:
+        for item in data:
+            print(f"item: {item}")
+            datamocked = [item[0], item[1], item[2], item[3], item[4], item[5]]
+            client.sheet.append_row(datamocked, table_range=f"A{client.last_row+1}")
+        return (True, "Unidades añadidos correctamente")
+    except gspread.exceptions.WorksheetNotFound:
+        raise WorksheetNotFound(f"{client.ws}")
+
 class SheetsService:
     def __init__(self, spreadsheet_name: str, sheet_name: str):
         # authorize the clientsheet
@@ -57,6 +88,7 @@ class SheetsService:
         self.spreadsheet_name = spreadsheet_name
         self.sheet_name = sheet_name
         self.data_mock = []
+        self.data_mock2 = []
 
     def __mock_formdata__(self, data):
         return self.client.last_row+1,data[0], data[1], data[2]
@@ -65,6 +97,7 @@ class SheetsService:
         if not data:
             raise dataAppendError("No hay datos para añadir")
 
+        # FORMULARI
         if type == "formdata":
             try:
                 self.data_mock = self.__mock_formdata__(data)
@@ -72,8 +105,8 @@ class SheetsService:
             except gspread.exceptions.WorksheetNotFound:
                 raise WorksheetNotFound(f"{self.client.ws}")
 
-
-        self.data_mock = mockData(data)
+        # FACTURES
+        self.data_mock, self.data_mock2 = mockData(data)
         remaining = self.data_mock.copy()
         batch_updates = []
 
@@ -111,6 +144,7 @@ class SheetsService:
         try:
             self.client.sheet.batch_update(batch_updates, value_input_option="USER_ENTERED")
             print(f"✅ Escrito {len(batch_updates)} bloque(s) en Google Sheets.")
+            append_data_row(self.data_mock2)
             return (True, "Datos añadidos correctamente")
 
         except gspread.exceptions.WorksheetNotFound:

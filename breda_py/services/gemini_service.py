@@ -3,6 +3,7 @@ from typing import List
 import json
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from .google_clients.gemini_utils.prompts import PROMPTS
 
 class Gemini:
     def __init__(self, imgs:List[str]):
@@ -10,28 +11,8 @@ class Gemini:
         self.data: list[dict] = []
         self.gemini = GeminiClient()
         self.model = "gemini-2.0-flash"
-        self.system_prompt = """
-            Eres un asistente experto en análisis documental y extracción estructurada de datos.
-            Tu tarea es interpretar facturas (en imagen o texto OCR) y devolver los datos principales
-            de forma precisa y estandarizada en formato JSON.
-
-            Además, debes inferir el tipo de material o gasto de la factura en base al contenido,
-            descripciones de productos o naturaleza del proveedor.
-
-            Reglas:
-            - No incluyas texto fuera del JSON.
-            - Si un dato no aparece, deja el campo vacío ("").
-            - Clasifica el tipo de material en una de estas categorías:
-            ["comida", "bebidas", "menaje", "limpieza", "servicios", "suministros", "otros"].
-            - El campo "total" debe estar en formato estándar con coma decimal. p.ej "1234.56" debe ser "1234,56".
-            - Usa sentido común y el nombre del proveedor o productos para inferir la categoría.
-            - Estandariza los valores numéricos a dos decimales (con punto decimal).
-            - Si hay varias facturas, devuelve una lista JSON con cada una como objeto independiente.
-            """
-        self.user_prompt = """
-            Analiza las siguientes imágenes de facturas y devuelve, en formato JSON, los campos:
-            num_de_documento, fecha, proveedor,NIF_CIF, tipo_material, total.
-            """
+        self.system_prompt = PROMPTS['SYSTEM_PROMTP']
+        self.user_prompt = PROMPTS['USER_PROMPT']
 
     def process_image(self, image_name: str):
         """Procesa una imagen individualmente con Gemini."""

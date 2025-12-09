@@ -3,11 +3,11 @@ from ..services.gemini_service import Gemini
 from ..services.sheets_service import SheetsService
 import os
 from dotenv import load_dotenv
-from pathlib import Path
 
 load_dotenv()
 GOOGLE_FACTURES_SPREADSHEET_ID=os.getenv("GOOGLE_FACTURES_SPREADSHEET_ID") or ""
 GOOGLE_SHEET = "2-JUSTIFICACIO_RELACIO DESPESES"
+GOOGLE_SHEET_DADES = "4-RELACIO_DESPESES_PER_UNITAT"
 
 
 class State(rx.State):
@@ -38,6 +38,7 @@ class State(rx.State):
 
         try:
             self.gemini_response = Gemini(self.data_img).get_result()
+            # print(f'response: {self.gemini_response}')
 
         except Exception as e:
             raise Exception(f"Error al procesar la imatge {str(e)}")
@@ -47,6 +48,7 @@ class State(rx.State):
             yield
 
             response = SheetsService(GOOGLE_FACTURES_SPREADSHEET_ID, GOOGLE_SHEET).append_row(self.gemini_response)
+            yield print(f'Dades correctes a {GOOGLE_SHEET}')
             if response is not None:
                 self.data_img = []
                 self.loading = False
